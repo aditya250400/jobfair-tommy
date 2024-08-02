@@ -1,0 +1,6 @@
+.env
+node_modules
+/docker/.data
+.vercel
+.env.local
+.env.prod

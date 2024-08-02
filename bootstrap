@@ -1,0 +1,6 @@
+#!/bin/sh -e
+
+docker-compose \
+    --project-name  jobfair-skripsi\
+    --file docker/docker-compose.yml \
+    up --detach --remove-orphans

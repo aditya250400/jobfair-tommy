@@ -1,0 +1,206 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  username  String
+  password  String
+  role      Role
+  name      String
+  phone     String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  cvs       CV[]
+  companies Company[]
+}
+
+model Company {
+  id            Int           @id @default(autoincrement())
+  user_id       Int
+  name          String
+  address       String
+  desc          String
+  social_media  String
+  email         String
+  phone         String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  locationStand String?
+  user          User          @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  rents         Rent[]
+  requirements  Requirement[]
+}
+
+model Requirement {
+  id              Int                    @id @default(autoincrement())
+  company_id      Int
+  min_age         Int
+  max_age         Int
+  gender          String[]
+  position        String
+  desc_job        String[]
+  skill           String[]
+  keyword         String[]
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+  cv_requirements CVRequirement[]
+  company         Company                @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  education       RequirementEducation[]
+}
+
+model RequirementEducation {
+  id             Int         @id @default(autoincrement())
+  requirement_id Int
+  degree         String
+  grade          Float
+  createdAt      DateTime    @default(now())
+  updateAt       DateTime    @updatedAt
+  major          String[]
+  Requirement    Requirement @relation(fields: [requirement_id], references: [id], onDelete: Cascade)
+}
+
+model JobFair {
+  id        Int      @id @default(autoincrement())
+  name      String
+  start     DateTime
+  end       DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  stands    Stand[]
+}
+
+model Stand {
+  id          Int      @id @default(autoincrement())
+  job_fair_id Int
+  number      Int
+  location    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  rents       Rent[]
+  jobFair     JobFair  @relation(fields: [job_fair_id], references: [id], onDelete: Cascade)
+}
+
+model Rent {
+  id         Int      @id @default(autoincrement())
+  stand_id   Int
+  company_id Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  company    Company  @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  stand      Stand    @relation(fields: [stand_id], references: [id], onDelete: Cascade)
+}
+
+model CV {
+  id              Int              @id @default(autoincrement())
+  user_id         Int
+  name            String
+  address         String
+  email           String
+  gender          Gender
+  phone           String
+  birth_date      DateTime
+  social_media    String[]
+  desc            String
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  achievement     Achievement[]
+  user            User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  cv_requirements CVRequirement[]
+  certificates    Certificate[]
+  educations      Education[]
+  experience      Experience[]
+  skill           Skills[]
+  workExperiences WorkExperience[]
+}
+
+model Skills {
+  id    Int      @id @default(autoincrement())
+  cv_id Int
+  name  String
+  skill String[]
+  cv    CV       @relation(fields: [cv_id], references: [id], onDelete: Cascade)
+}
+
+model Achievement {
+  id       Int    @id @default(autoincrement())
+  cv_id    Int
+  name     String
+  provider String
+  year     String
+  cv       CV     @relation(fields: [cv_id], references: [id], onDelete: Cascade)
+}
+
+model Experience {
+  id          Int    @id @default(autoincrement())
+  cv_id       Int
+  name        String
+  description String
+  cv          CV     @relation(fields: [cv_id], references: [id], onDelete: Cascade)
+}
+
+model CVRequirement {
+  id             Int         @id @default(autoincrement())
+  cv_id          Int
+  requirement_id Int
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  cv             CV          @relation(fields: [cv_id], references: [id], onDelete: Cascade)
+  requirement    Requirement @relation(fields: [requirement_id], references: [id], onDelete: Cascade)
+}
+
+model Education {
+  id        Int      @id @default(autoincrement())
+  cv_id     Int
+  name      String
+  degree    String
+  major     String
+  address   String
+  start_at  DateTime
+  end_at    DateTime
+  grade     Float
+  desc      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  cv        CV       @relation(fields: [cv_id], references: [id], onDelete: Cascade)
+}
+
+model WorkExperience {
+  id        Int      @id @default(autoincrement())
+  cv_id     Int
+  name      String
+  position  String
+  start_at  DateTime
+  end_at    DateTime
+  address   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  desc      String[]
+  cv        CV       @relation(fields: [cv_id], references: [id], onDelete: Cascade)
+}
+
+model Certificate {
+  id        Int      @id @default(autoincrement())
+  cv_id     Int
+  name      String
+  image     String
+  desc      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  cv        CV       @relation(fields: [cv_id], references: [id], onDelete: Cascade)
+}
+
+enum Gender {
+  male
+  female
+}
+
+enum Role {
+  Panitia
+  Pelamar
+}
